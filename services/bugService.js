@@ -2,7 +2,7 @@ import { utilService } from './util.service.js'
 import fs from 'fs'
 
 
-const bugs = utilService.readJsonFile('../data/bug.json')
+const bugs = utilService.readJsonFile('./data/bug.json')
 //console.log(bugs);
 
 export const bugService = {
