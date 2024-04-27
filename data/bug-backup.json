@@ -1,0 +1,26 @@
+[
+    {
+        "_id": "a1",
+        "title": "Cannot save a Car",
+        "severity": 3,
+        "createdAt": 1542107359454
+    },
+    {
+        "_id": "a2",
+        "title": "Cannot remove a Car",
+        "severity": 1,
+        "createdAt": 1542107359456
+    },
+    {
+        "_id": "a3",
+        "title": "Cannot update a Car",
+        "severity": 2,
+        "createdAt": 1542107359457
+    },
+    {
+        "_id": "a4",
+        "title": "Cannot create a Car",
+        "severity": 5,
+        "createdAt": 1542107359458
+    }
+]
