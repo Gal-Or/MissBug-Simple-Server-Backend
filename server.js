@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 
-import { bugService } from './bugService.js'
+import { bugService } from './services/bugService.js'
 
 const app = express()
 
@@ -73,5 +73,5 @@ app.get('/api/bug/:bugId/remove', async (req, res) => {
 })
 
 
-const port = 3030
-app.listen(port, () => console.log('Server ready at port 3030'))
+const port = process.env.PORT || 3030
+app.listen(port, () => console.log(`Server ready at port ${port}`))
