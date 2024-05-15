@@ -1,0 +1,36 @@
+[
+    {
+        "_id": "u101",
+        "fullname": "Muki Ja",
+        "username": "muki",
+        "password": "muki1234",
+        "score": 100
+    },
+    {
+        "_id": "u102",
+        "fullname": "Shoko La",
+        "username": "Shoko",
+        "password": "shoko1234",
+        "score": 100
+    },
+    {
+        "_id": "u104",
+        "fullname": "Lala Dp",
+        "username": "Lala",
+        "password": "lala1234",
+        "score": 96
+    },
+    {
+        "fullname": "Gogo Ma",
+        "username": "gogo",
+        "password": "gogo1234",
+        "score": 55,
+        "_id": "aoJmoS"
+    },
+    {
+        "username": "galor",
+        "password": "1234",
+        "fullname": "gal or",
+        "_id": "tAR534"
+    }
+]
