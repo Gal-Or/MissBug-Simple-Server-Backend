@@ -1,7 +1,11 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import path from 'path'
+// import cookieParser from 'cookie-parser'
 
-import { bugService } from './services/bugService.js'
+
+
 
 const app = express()
 
@@ -17,61 +21,28 @@ const corsOptions = {
 
 // Express Config:
 app.use(express.static('public'))
-// app.use(cookieParser())
+app.use(cookieParser())
 app.use(cors(corsOptions))
+app.use(express.json())
+
+
+import { bugRoutes } from './api/bug/bug.routes.js'
+app.use('/api/bug', bugRoutes)
+
+import { userRoutes } from './api/user/user.routes.js'
+app.use('/api/user', userRoutes)
+
+import { authRoutes } from './api/auth/auth.routes.js'
+app.use('/api/auth', authRoutes)
+
 
 app.get('/', (req, res) => res.send('Hello there'))
 
-app.get('/api/bug', async (req, res) => {
 
-    try {
-        const bugs = await bugService.query()
-        res.send(bugs)
-    } catch (err) {
-        res.status(400).send(`Could'nt get cars`)
-    }
 
+app.get('/**', (req, res) => {
+    res.sendFile(path.resolve('public/index.html'))
 })
-
-app.get('/api/bug/save', async (req, res) => {
-
-    try {
-        var bugToSave = {
-            _id: req.query.id,
-            title: req.query.title,
-            severity: +req.query.severity,
-            createdAt: +req.query.createdAt
-        }
-
-        bugToSave = await bugService.save(bugToSave)
-        res.send(bugToSave)
-    } catch (err) {
-        res.status(400).send(err)
-    }
-})
-
-app.get('/api/bug/:bugId', async (req, res) => {
-    try {
-        const bugId = req.params.bugId
-        const bug = await bugService.getById(bugId)
-        res.send(bug)
-
-    } catch (err) {
-        res.status(400).send(err)
-    }
-})
-
-app.get('/api/bug/:bugId/remove', async (req, res) => {
-    try {
-        const bugId = req.params.bugId
-        await bugService.remove(bugId)
-        res.send('deleted')
-
-    } catch (err) {
-        res.status(400).send(err)
-    }
-})
-
 
 const port = process.env.PORT || 3030
 app.listen(port, () => console.log(`Server ready at port ${port}`))
