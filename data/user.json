@@ -21,16 +21,17 @@
         "score": 96
     },
     {
+        "_id": "aoJmoS",
         "fullname": "Gogo Ma",
         "username": "gogo",
         "password": "gogo1234",
-        "score": 55,
-        "_id": "aoJmoS"
+        "score": 55
     },
     {
+        "_id": "tAR534",
+        "fullname": "gal or",
         "username": "galor",
         "password": "1234",
-        "fullname": "gal or",
-        "_id": "tAR534"
+        "score": 100
     }
 ]

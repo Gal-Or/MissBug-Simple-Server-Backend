@@ -2,7 +2,7 @@
     {
         "title": "Cannot update a Car",
         "description": "errors when clicking Save",
-        "severity": 88,
+        "severity": 7878,
         "createdAt": 1714919975235,
         "_id": "Hlbb2o",
         "creator": {
@@ -13,7 +13,7 @@
     {
         "title": "Cannot update a Car",
         "description": "errors when clicking Save",
-        "severity": 54,
+        "severity": 12,
         "createdAt": 1714919998359,
         "_id": "kmpNWl",
         "creator": {
@@ -33,11 +33,10 @@
         "_id": "ronCd6"
     },
     {
-        "title": "new bug!",
-        "description": "errors when clicking Save!!",
-        "severity": 30,
-        "_id": "E351pY",
-        "createdAt": 1715767899084,
+        "title": "gals bug",
+        "severity": 100,
+        "_id": "PVccsL",
+        "createdAt": 1715785947440,
         "creator": {
             "_id": "tAR534",
             "fullname": "gal or"
