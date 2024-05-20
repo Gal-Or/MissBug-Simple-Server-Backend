@@ -35,8 +35,8 @@ export async function removeBug(req, res) {
         //const bugToRemove = await bugService.getById(bugId)
         //if (bugToRemove.creator._id !== loggedinUser._id) return res.status(401).send('Not Your Bug')
 
-        await bugService.remove(bugId, loggedinUser)
-        res.send('deleted')
+        const bugID = await bugService.remove(bugId, loggedinUser)
+        res.send(`bug with id: ${bugID} deleted`)
 
     } catch (err) {
         res.status(400).send(err)

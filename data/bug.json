@@ -4,7 +4,6 @@
         "description": "errors when clicking Save",
         "severity": 7878,
         "createdAt": 1714919975235,
-        "_id": "Hlbb2o",
         "creator": {
             "_id": "u102",
             "fullname": "Shoko La"
@@ -15,7 +14,6 @@
         "description": "errors when clicking Save",
         "severity": 12,
         "createdAt": 1714919998359,
-        "_id": "kmpNWl",
         "creator": {
             "_id": "u101",
             "fullname": "Muki Ja"
@@ -29,13 +27,11 @@
         "creator": {
             "_id": "u101",
             "fullname": "Muki Ja"
-        },
-        "_id": "ronCd6"
+        }
     },
     {
         "title": "gals bug",
         "severity": 100,
-        "_id": "PVccsL",
         "createdAt": 1715785947440,
         "creator": {
             "_id": "tAR534",

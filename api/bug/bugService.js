@@ -1,9 +1,30 @@
 import { utilService } from '../../services/util.service.js'
+import { dbService } from '../../services/db.service.js'
+import { loggerService } from './../../services/logger.service.js';
+
+
+import mongodb from 'mongodb'
+const { ObjectId } = mongodb
+
 import fs from 'fs'
+import { log } from 'console'
+
 
 const PAGE_SIZE = 2
-const bugs = utilService.readJsonFile('./data/bug.json')
+
+//checkDB()
+//const bugs = utilService.readJsonFile('./data/bug.json')
 //console.log(bugs);
+
+async function checkDB() {
+
+    const collection = await dbService.getCollection('bug')
+    console.log("coll from checkDB : " + await collection.find({}).toArray());
+    const bugs = await collection.find()
+    const arr = await bugs.toArray()
+    console.log("bugs from mongo : " + JSON.stringify(arr, null, 2));
+    // return bugs
+}
 
 export const bugService = {
 
@@ -18,104 +39,73 @@ export const bugService = {
 }
 
 async function query(filterBy = {}, sort = {}) {
-    let filteredBugs = [...bugs]
 
     try {
 
-        if (filterBy.txt) {
-            const regExp = new RegExp(filterBy.txt, 'i')
-            filteredBugs = filteredBugs.filter(bug => regExp.test(bug.title))
-        }
-        if (filterBy.minSeverity) {
-            filteredBugs = filteredBugs.filter(bug => bug.severity >= filterBy.minSeverity)
-        }
-
-        switch (sort.sortBy) {
-            case 'title':
-                console.log("in case title");
-                filteredBugs = filteredBugs.sort(bugService.compareByTitle)
-                break
-            case 'severity':
-                filteredBugs = filteredBugs.sort(bugService.compareBySeverity)
-                break
-            case 'createdAt':
-                filteredBugs = filteredBugs.sort(bugService.compareByCreatedAt)
-                break
-        }
-        if (sort.sortDir === '-1')
-            filteredBugs = filteredBugs.reverse()
+        const criteria = _buildCriteria(filterBy)
+        const collection = await dbService.getCollection('bug')
+        var bugCursor = await collection.find(criteria).sort({ description: +sort.sortDir })
 
         if (filterBy.pageIdx !== undefined) {
-            const startIdx = filterBy.pageIdx * PAGE_SIZE
-            filteredBugs = filteredBugs.slice(startIdx, startIdx + PAGE_SIZE)
+            bugCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
         }
 
-        return filteredBugs
+        const bugs = bugCursor.toArray()
+        return bugs
+
 
     } catch (error) {
+        loggerService.error("bugService.js, function: query,  error: ", err)
+
         throw error
     }
 }
 
 async function getById(bugId) {
     try {
-        const bug = bugs.find(bug => bug._id === bugId)
-        if (!bug) throw `Cant find bug with id =  ${bugId}`
+        const collection = await dbService.getCollection('bug')
+        const bug = await collection.findOne({ "_id": ObjectId(bugId) })
         return bug
-    } catch (error) {
-        throw error
+    } catch (err) {
+        loggerService.error("bugService.js, function: getById,  error: ", err)
+        throw err
     }
 }
 
 async function remove(bugId, loggedinUser) {
     try {
-        const idx = bugs.findIndex(bug => bug._id === bugId)
-        if (idx < 0) throw `Cant find bug with id ${bugId}`
+        const collection = await dbService.getCollection('bug')
+        const bug = await collection.deleteOne({ _id: ObjectId(bugId) })
+        return bugId
 
-        const bugToRemove = bugs[idx]
-        if (bugToRemove.creator._id !== loggedinUser._id) throw { msg: `Not your bug`, code: 403 }
-
-        bugs.splice(idx, 1)
-        _saveBugsToFile()
-    } catch (error) {
-        throw error
+    } catch (err) {
+        loggerService.error("bugService.js, function:remove,  error: ", err)
+        throw err
     }
 }
 
-async function save(bugToSave, loggedinUser) {
+async function save(bug, loggedinUser) {
     try {
-        if (bugToSave._id) {
-            const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
-            if (idx < 0) throw `Cant find bug with id ${bugToSave._id}`
-
-            const bug = bugs[idx]
-            if (bug.creator._id !== loggedinUser._id) throw { msg: `Not your bug`, code: 403 }
-
-            bugToSave = { ...bug, ...bugToSave }
-            bugs.splice(idx, 1, bugToSave)
+        if (bug._id) {
+            const bugToSave = {
+                title: bug.title,
+                description: bug.description,
+                severity: bug.severity
+            }
+            const collection = await dbService.getCollection('bug')
+            await collection.updateOne({ _id: ObjectId(bug._id) }, { $set: bugToSave })
 
         } else {
-            bugToSave._id = utilService.makeId()
-            bugToSave.createdAt = Date.now()
-            bugToSave.creator = loggedinUser
-            bugs.push(bugToSave)
+            bug.createdAt = Date.now()
+            bug.creator = loggedinUser
+            const collection = await dbService.getCollection('bug')
+            await collection.insertOne(bug)
         }
-        await _saveBugsToFile()
-        return bugToSave
+        return bug
     } catch (error) {
+        loggerService.error("bugService.js, function:save,  error: ", err)
         throw error
     }
-}
-
-
-function _saveBugsToFile(path = './data/bug.json') {
-    return new Promise((resolve, reject) => {
-        const data = JSON.stringify(bugs, null, 4)
-        fs.writeFile(path, data, (err) => {
-            if (err) return reject(err)
-            resolve()
-        })
-    })
 }
 
 function compareByTitle(bug1, bug2) {
@@ -136,4 +126,34 @@ function compareBySeverity(bug1, bug2) {
 function compareByCreatedAt(bug1, bug2) {
 
     return bug1.createdAt - bug2.createdAt
+}
+
+function _buildCriteria(filterBy) {
+
+    var criteria = {}
+
+    if (filterBy.txt) {
+        criteria = {
+            $or: [{ title: { $regex: filterBy.txt, $options: 'i' } },
+            { description: { $regex: filterBy.txt, $options: 'i' } }]
+        }
+    }
+    if (filterBy.minSeverity) {
+        criteria = { ...criteria, severity: { $gt: filterBy.minSeverity } }
+    }
+
+    console.log("criteria= ", criteria);
+
+    return criteria
+
+}
+
+function _saveBugsToFile(path = './data/bug.json') {
+    return new Promise((resolve, reject) => {
+        const data = JSON.stringify(bugs, null, 4)
+        fs.writeFile(path, data, (err) => {
+            if (err) return reject(err)
+            resolve()
+        })
+    })
 }
